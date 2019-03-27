@@ -4,11 +4,12 @@ const webClient  = require('request');
 const ngrok      = require('ngrok');
 const express    = require('express');
 
-const language   = 'us';
-const ipAddress  = '192.168.10.104'
-const serverPort = 8079;
-const app        = express();
-const TOKEN      = 'you-nature-remo-token';
+const language    = 'us';
+const ipAddress   = '192.168.10.104'
+const serverPort  = 8077;
+const app         = express();
+const natureToken = 'you-nature-remo-token';
+const ngrokToken  = 'your-ngrok-token'
 
 // googlehome speaks message
 const googleNotify = (message) => {
@@ -24,12 +25,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 
 // Execute when a get request is received 
-app.get('/', function (req, res) {   
-    
+app.get('/', function (req, res) {  
+    console.log("get"); 
     // get temperature or humidity from nature remo
     webClient.get({
         url: "https://api.nature.global/1/devices",
-        headers: { "Authorization": "Bearer " + TOKEN }
+        headers: { "Authorization": "Bearer " + natureToken }
     }, function(error, response, body){
         const obj   = JSON.parse(body)[0];
         const value = req.body.value || "";
@@ -56,11 +57,13 @@ app.listen(serverPort, function () {
     console.log("listen start");
 
     (async function() {
-        const url = await ngrok.connect(serverPort);
+        const url = await ngrok.connect({
+            // proto: 'http',          // http|tcp|tls, defaults to http
+            addr: serverPort,       // port or network address, defaultst to 80
+            authtoken: ngrokToken,  // your authtoken from ngrok.com
+            region: 'ap',           // one of ngrok regions (us, eu, au, ap), defaults to us
+        })
+        .catch( (err) => {console.log(err);} );
         console.log("URL: " + url);
     })();
 })
-
-
-
-

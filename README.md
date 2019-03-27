@@ -17,3 +17,9 @@ vim package.json
 
 npm update google-tts-api 
 ```
+
+test
+
+```
+ curl -X GET -H "Content-Type:application/json" -d '{"value":"temperature"}' <url>
+```
